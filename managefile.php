@@ -75,7 +75,9 @@ if ($action == "uploadAsync") {
     //Loop through uploaded files
 	foreach($_FILES as $file) {
 		//encrypt files in their tmp location
-    	$myfile->encryptFile($file["tmp_name"], $settings["filePass"]);
+        if ($use_encryption) {
+            $myfile->encryptFile($file["tmp_name"], $settings["filePass"]);
+        }
 		//upload them to the files folder and add to the database
         $fid = $myfile->uploadAsync($file["name"], $file["tmp_name"], $file["type"], $file["size"], $upath, $id, $upfolder);
         //get the new file object
@@ -329,7 +331,9 @@ elseif($action == "downloadfile")
 	header('Cache-Control: must-revalidate, post-check=0, pre-check=0');
 	header('Pragma: public');
 	//Try to decrypt the file
-	$plaintext = $myfile->decryptFile($filePath, $settings["filePass"]);
+    if($use_encryption){
+    	$plaintext = $myfile->decryptFile($filePath, $settings["filePass"]);
+    }
 
 	//no plaintext means file was not encrypted or not decrypted. however deliver to unmodified file
 	if(!$plaintext)
